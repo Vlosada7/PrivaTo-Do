@@ -22,6 +22,8 @@ const createBlock = async (req, res) => {
 						.toString(),
 					previous: lastBlock.hash,
 				});
+        lastBlock.next = newBlock.hash;
+        await lastBlock.save();
 				await newBlock.save();
 				res.status(201).send({ message: "New block created", block: newBlock });
 			}
@@ -52,6 +54,8 @@ const completeBlock = async (req, res) => {
 					previous: lastBlock.hash,
 					completed: true,
 				});
+        lastBlock.next = newBlock.hash;
+        await lastBlock.save();
 				await newBlock.save();
 				res
 					.status(201)
@@ -71,4 +75,23 @@ const completeBlock = async (req, res) => {
 	}
 };
 
-module.exports = { createBlock, completeBlock };
+const getBlockInOrder = async (req, res) => {
+  const blocks = await Block.find();
+  if (blocks.length > 0) {
+    const firstBlock = blocks.find(block => !block.previous);
+    const lastBlock = blocks.find(block => !block.next);
+    let currentBlock = firstBlock;
+    const orderedBlocks = [];
+  
+    while(currentBlock) {
+      orderedBlocks.push(currentBlock);
+      if (currentBlock === lastBlock) break;
+      currentBlock = blocks.find(block => currentBlock.next === block.hash);
+    };  
+    res.status(200).send(orderedBlocks);
+  } else {
+    res.status(404).send({message: 'Blockchain is empty'});
+  }
+}
+
+module.exports = { createBlock, completeBlock, getBlockInOrder };
