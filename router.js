@@ -1,8 +1,8 @@
 const Express = require("express");
 const router = Express.Router();
-const taskController = require('./controller/task');
+const blockController = require('./controller/Blocks');
 
-router.post('/create', taskController.createTask);
-router.put('/complete', taskController.completeTask);
+router.post('/create', blockController.createBlock);
+router.put('/complete', blockController.completeBlock);
 
 module.exports = router;
