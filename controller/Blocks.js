@@ -9,7 +9,7 @@ const createBlock = async (req, res) => {
 				const newBlock = new Block({
 					timeStamp: Date.now(),
 					data: req.body.task,
-					hash: crypto.SHA256(req.body + this.timeStamp).toString(),
+					hash: crypto.SHA256(req.body.task + this.timeStamp).toString(),
 				});
 				await newBlock.save();
 				res.status(201).send({ message: "New block created", block: newBlock });
@@ -18,7 +18,7 @@ const createBlock = async (req, res) => {
 					timeStamp: Date.now(),
 					data: req.body.task,
 					hash: crypto
-						.SHA256(req.body + this.timeStamp + lastBlock.hash)
+						.SHA256(req.body.task + this.timeStamp + lastBlock.hash)
 						.toString(),
 					previous: lastBlock.hash,
 				});
@@ -52,7 +52,7 @@ const completeBlock = async (req, res) => {
 						.SHA256(selectedBlock.data + this.timeStamp + lastBlock.hash)
 						.toString(),
 					previous: lastBlock.hash,
-					completed: true,
+					completed: (!selectedBlock.completed),
 				});
         lastBlock.next = newBlock.hash;
         await lastBlock.save();
